@@ -1,0 +1,6 @@
+taille : 310*86 px
+Ecriture :
+	32
+	pas en gras
+	Cambria
+	placé à 40px du bord gauche
