@@ -37,7 +37,7 @@ unsigned int ** moyenne_matrice(unsigned int *** tab_matrice, int nb_matrice){
 }
       
 unsigned int** profondeur_to_altitude(unsigned int** matrice_profondeur,int nl,int nc){
-  //Cree une nouvelle matrice correspondant a une matrice d'altitude
+  //Cree une matrice et realise la transformation pour passer de mesures de profondeur a celle d'altitude
   int i,j;
   unsigned int** matrice_alt=alloueMatriceInt(nl,nc);
   int max = trouveMaximunI(matrice_profondeur,nl,nc);
@@ -104,6 +104,7 @@ int calcul_gradient_ligne(COUPLE** matrice_gradient,int numero,char mode){
 }
 
 int calcul_gradient_droite(COUPLE** matrice_gradient,COUPLE p1,COUPLE p2){
+//Somme le gradient d'un droite quelconque
   int total=0,k1,k2;
   int delta_c=p1.c -p2.c;
   int delta_l =p1.l - p2.l;
@@ -134,10 +135,6 @@ int trouve_bord_haut(COUPLE** matrice_gradient){
   int tab_gradient[240];
   for(i=0;i<240;i++){
     tab_gradient[i]=calcul_gradient_ligne(matrice_gradient,i,'l');
-
-    //printf("Le gradient de la ligne %d vaut %d\n",i,tab_gradient[i]);
-
-
   }
   m=indice_min(tab_gradient,0,240);
   return m;
@@ -149,8 +146,6 @@ int trouve_bord_bas(COUPLE** matrice_gradient){
   int tab_gradient[239];
   for(i=0;i<239;i++){
     tab_gradient[i]=calcul_gradient_ligne(matrice_gradient,i+240,'l');
-
-    //printf("Le gradient de la ligne %d vaut %d\n",i+240,tab_gradient[i]);
   }
   m=indice_min(tab_gradient,0,239);
   return m+240;
@@ -162,8 +157,6 @@ int trouve_bord_gauche(COUPLE** matrice_gradient){
   int tab_gradient[320];
   for(i=0;i<320;i++){
     tab_gradient[i]=calcul_gradient_ligne(matrice_gradient,i,'c');
-
-    //printf("Le gradient de la colonne %d vaut %d\n",i,tab_gradient[i]);
   }
   m=indice_min(tab_gradient,0,240);
   return m;
