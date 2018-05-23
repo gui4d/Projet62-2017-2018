@@ -5,6 +5,7 @@
 #define MAXINT 65535
 
 unsigned int** alloueMatriceInt(int nl,int nc){
+//Realise l'allocation dynamique d'une matrice de taille nl*nc
   int i;
   unsigned int** p = calloc(nl,sizeof(*p));
   *p = calloc(nl*nc,sizeof(**p));
@@ -15,11 +16,13 @@ unsigned int** alloueMatriceInt(int nl,int nc){
 }
 
 void libereMatrice(void** matrice){
+//Realise la liberation memoire d'un matrice cree avec alloueMatriceInt
   free(*matrice);
   free(matrice);
 }
 
 unsigned int trouveMaximunI(unsigned int ** matrice, int nl, int nc) {
+//Renvoie l'element maximum d'une matrice de taille nl*nc
 	int i, j;
 	unsigned int max = matrice[0][0];
 	for (i = 0; i < nl; i++){
@@ -31,6 +34,7 @@ unsigned int trouveMaximunI(unsigned int ** matrice, int nl, int nc) {
 }
 
 unsigned int trouveMinimunI(unsigned int** matrice, int nl, int nc) {
+//Renvoie l'element minimum d'une matrice de taille nl*nc
 	int i, j;
 	unsigned int min = matrice[0][0];
 	for (i = 0; i < nl; i++) {
@@ -42,8 +46,8 @@ unsigned int trouveMinimunI(unsigned int** matrice, int nl, int nc) {
 }
 
 int visualiseMatriceInt(unsigned int** matrice, int nl, int nc) {
-  //Create a SDL window which will represent the matrix
-  //Black is a high value  whereas white represents a small  one 
+  //Cree un fenetre SDL qui represente la matrice de taille nl*nc
+  //Le noir correspond a des valeurs elevees et le blanc a des valeurs faibles
    
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) < 0){
 		fprintf(stderr, "Echec d'initialisation de la SDL dans la fonction visualiseMatrice: %s \n", SDL_GetError());
@@ -64,7 +68,7 @@ int visualiseMatriceInt(unsigned int** matrice, int nl, int nc) {
 	
 	max = trouveMaximunI(matrice, nl, nc);
 	min = trouveMinimunI(matrice, nl, nc);
-	//Color each pixels of the matrix				
+	//Colorise chaque pixel de la matrice			
 	for (i = 0; i < nl; i++){
 	    for (j = 0; j < nc; j++){
 		niveauGris = (255 * (matrice[i][j] - min)) / (max - min);
@@ -125,7 +129,7 @@ int indice_min(int* tab,int debut,int fin){
   return k;
 }
 
-
+//inutile au final
 void visualise_image_kinect(unsigned int** matrice,COUPLE p1, COUPLE p2){
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) < 0){
     fprintf(stderr, "Echec d'initialisation de la SDL dans la fonction visualiseMatrice: %s \n", SDL_GetError());
@@ -187,6 +191,7 @@ void visualise_image_kinect(unsigned int** matrice,COUPLE p1, COUPLE p2){
 
 void recupere_calibrage_manuel(COUPLE* haut_gauche,COUPLE* haut_droit,
 		      COUPLE* bas_droit,COUPLE* bas_gauche){	
+//Fonction recupererant les coordonnees de 4 points ou la souris clique et realisant un traitement pour obtenir un trapèze adéquat
 
   SDL_Event ev;
   int k=0;
@@ -239,6 +244,7 @@ void recupere_calibrage_manuel(COUPLE* haut_gauche,COUPLE* haut_droit,
 
 void dessine_rectangle(SDL_Renderer* pRenderer,COUPLE haut_gauche,COUPLE haut_droit,
 		       COUPLE bas_droit,COUPLE bas_gauche){
+//Dessine un rectangle en reliant les point sur le renderer en parametre
   SDL_SetRenderDrawColor(pRenderer,255,0,0,255);
   SDL_RenderDrawLine(pRenderer,haut_gauche.c,haut_gauche.l,haut_droit.c,haut_droit.l);
   SDL_RenderDrawLine(pRenderer,bas_gauche.c,bas_gauche.l,bas_droit.c,bas_droit.l);
@@ -248,6 +254,7 @@ void dessine_rectangle(SDL_Renderer* pRenderer,COUPLE haut_gauche,COUPLE haut_dr
 }
 
 int est_dans_trapeze(int i,int j,COUPLE haut_gauche,COUPLE haut_droit,COUPLE bas_droit,COUPLE bas_gauche){
+//Retourne 1 si le point de coordonee i j est dans le trapeze delimite par les quatres points donnes, 0 sinon
 
 	if(i<haut_gauche.l || i> bas_droit.l || j< bas_gauche.c  || j>bas_droit.c) return 0; //cas externe trivial
   if(j>=haut_gauche.c && j<= haut_droit.c) return 1; // cas interne trivial 
@@ -267,6 +274,7 @@ int est_dans_trapeze(int i,int j,COUPLE haut_gauche,COUPLE haut_droit,COUPLE bas
 
 
 unsigned int** recopie_matrice(unsigned int** matrice,COUPLE haut_gauche,COUPLE haut_droit,COUPLE bas_droit,COUPLE bas_gauche){
+//Cree une matrice afin de recopier les information se trouvant dans le trapeze delimite par les point en parametre
   unsigned int** copie_matrice = alloueMatriceInt(bas_droit.l - haut_droit.l +1 ,
 						  bas_droit.c - bas_gauche.c +1 );
   int i,j;
@@ -284,6 +292,7 @@ unsigned int** recopie_matrice(unsigned int** matrice,COUPLE haut_gauche,COUPLE 
   
 void calibrage_manuel(unsigned int** matrice,COUPLE* haut_gauche,COUPLE* haut_droit,
 			       COUPLE* bas_droit,COUPLE* bas_gauche){
+//Fonction permettant le calibrage manuel sur une matrice donnee
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) < 0){
     fprintf(stderr, "Echec d'initialisation de la SDL dans la fonction visualiseMatrice: %s \n", SDL_GetError());
     return;
@@ -303,7 +312,7 @@ void calibrage_manuel(unsigned int** matrice,COUPLE* haut_gauche,COUPLE* haut_dr
   max = trouveMaximunI(matrice, 480, 640);
   min = trouveMinimunI(matrice, 480, 640);
   
-  //Color each pixels of the matrix				
+  //Colorise chaque pixel de la matrice				
   for (i = 0; i < 480; i++){
     for (j = 0; j < 640; j++){
       niveauGris = (255 * (matrice[i][j] - min)) / (max - min);
@@ -318,8 +327,8 @@ void calibrage_manuel(unsigned int** matrice,COUPLE* haut_gauche,COUPLE* haut_dr
   dessine_rectangle(pRenderer,*haut_gauche,*haut_droit,*bas_droit,*bas_gauche);
   SDL_RenderPresent(pRenderer);  
   SDL_Delay(2000);
-	SDL_DestroyRenderer(pRenderer);
-	SDL_DestroyWindow(pWindow);
+  SDL_DestroyRenderer(pRenderer);
+  SDL_DestroyWindow(pWindow);
 }
 
   
