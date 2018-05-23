@@ -6,7 +6,9 @@
 
 
 
-unsigned int** initialisation_manuel_relief(int nl_Final,int nc_Final){//prends en entre les dimmenssions final souhaitees et renvoi l'adresse de la matrice traite
+//prends en parametre les dimmenssions de la matrice de relief et renvoi l'adresse de la matrice aloue dynamiquement. 
+//cette dernier matrice a deja subi les traitements d image
+unsigned int** initialisation_manuel_relief(int nl_Final,int nc_Final){
   COUPLE haut_gauche;
   COUPLE haut_droit;
   COUPLE bas_droit;
