@@ -5,7 +5,7 @@
 #include"acquisition.h"
 
 
-
+//coucou
 unsigned int** initialisation_manuel_relief(int nl_Final,int nc_Final){//prends en entre les dimmenssions final souhaitees et renvoi l'adresse de la matrice traite
   COUPLE haut_gauche;
   COUPLE haut_droit;
