@@ -292,7 +292,7 @@ unsigned int** recopie_matrice(unsigned int** matrice,COUPLE haut_gauche,COUPLE 
   
 void calibrage_manuel(unsigned int** matrice,COUPLE* haut_gauche,COUPLE* haut_droit,
 			       COUPLE* bas_droit,COUPLE* bas_gauche){
-//Fonction permettant le calibrage manuel sur une matrice donnee
+//Fonction permettant le calibrage manuel sur une matrice donnee 
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) < 0){
     fprintf(stderr, "Echec d'initialisation de la SDL dans la fonction visualiseMatrice: %s \n", SDL_GetError());
     return;
@@ -337,6 +337,7 @@ void calibrage_manuel(unsigned int** matrice,COUPLE* haut_gauche,COUPLE* haut_dr
 
 
 unsigned int** redimensionne_matrice(unsigned int** matrice_init, int nl_init, int nc_init,int nl_cible,int nc_cible){
+	//prends une matrice de relief ses tailles , et les tailles souhaitee.renvoie une matrice remplie par interpolation de la premiere  
   unsigned int** matrice_cible=alloueMatriceInt(nl_cible,nc_cible);
   unsigned int** matrice_marqueurs=alloueMatriceInt(nl_cible,nc_cible);
   int i,j,i_cible,j_cible;
@@ -355,12 +356,17 @@ unsigned int** redimensionne_matrice(unsigned int** matrice_init, int nl_init, i
 
 
 unsigned int** retouche_matrice(unsigned int** matrice_init, int nl, int nc){
-  unsigned int** matrice_cible=alloueMatriceInt(nl,nc);
+	//prends une matrice dont certains points sont de valeur MAXINT (les points inutils: en dehors du bac a sable )
+	//la fonction cree une matrice avec seulement les points utils. revient a faire une transformation trapeze rectangle. 
+
+  unsigned int** matrice_cible=alloueMatriceInt(nl,nc);//nouvelle matrice 
   unsigned int** matrice_marqueurs=alloueMatriceInt(nl,nc);
+	//matrice de marqueurs: indique les points de la nouvelle matrice qui sont remplis (soit par les points originaux de matric_init soit par interpolation)
   BORNES* matrice_bornes_c=calloc(nl,sizeof(*matrice_bornes_c));
   int borne_inf=0;
   int borne_sup=0;
   int i,j;
+	
   for(i=0;i<nl;i++){
     borne_inf=0;
     borne_sup=0;
@@ -386,7 +392,6 @@ unsigned int** retouche_matrice(unsigned int** matrice_init, int nl, int nc){
 				
 				i_cible=i;
 				j_cible=(j-matrice_bornes_c[i].inf)*nc/(matrice_bornes_c[i].sup - matrice_bornes_c[i].inf+1);
-				//printf("%d--%d-cible %d-%d\n",i,j,i_cible,j_cible);
 				matrice_cible[i_cible][j_cible]=matrice_init[i][j];
 				matrice_marqueurs[i_cible][j_cible]=1;
       }
@@ -400,6 +405,8 @@ unsigned int** retouche_matrice(unsigned int** matrice_init, int nl, int nc){
 }
 
 void completter_matrice(unsigned int** matrice_cible, unsigned int** matrice_marqueurs,int nl,int nc){
+	//prends en argument une matrice incomplette et  une matrice donnant les points deja remplis.
+	//La fonction complette la matrice par interpolation
 	int i, j, i_cible, j_cible;
 	int adresse_avant;
   int adresse_apres;
@@ -411,6 +418,10 @@ void completter_matrice(unsigned int** matrice_cible, unsigned int** matrice_mar
     adresse_avant=-1;
     adresse_apres=-1;
     remplissage=10;//par defaut
+	//remplissage est la variable qui informe sur l'etat de completion d une ligne:
+	//lorsque remplissage est a 10 la fonction doit chercher les  bornes du prochain segnent de points a remplir 
+	//lorsque remplissage est à 0 la fonction a la borne inferieur et dois chercher la borne superieur 
+	//remplissage doit passer a 0 des que la fonction trouve la borne superieur: la fonction passera en mode remplissage du segment (interpolation) 
     while(j<nc){
       if( matrice_marqueurs[i_cible][j]==0){
 				adresse_apres=j;
@@ -449,8 +460,7 @@ void completter_matrice(unsigned int** matrice_cible, unsigned int** matrice_mar
 	    valeur_apres=matrice_cible[i_cible][adresse_apres];
 	  }
 	}
-	int baladeur;
-	//printf("//ligne:%d,zone:%d-%d,valeur: %d \n",i_cible,adresse_avant,adresse_apres,valeur_avant);
+	int baladeur;//parcourt un a un les points du segment a remplir.
 	for(baladeur=adresse_avant+1;baladeur<adresse_apres;baladeur++){
 	  matrice_cible[i_cible][baladeur]=(baladeur-adresse_avant)*(valeur_avant-valeur_apres)/(adresse_avant-adresse_apres)+valeur_avant;
 	  matrice_marqueurs[i_cible][baladeur]=1;
@@ -469,7 +479,7 @@ void completter_matrice(unsigned int** matrice_cible, unsigned int** matrice_mar
     i=0;
     adresse_avant=-1;
     adresse_apres=-1;
-    remplissage=10;//par defaut vaut 10, vaut 0 lorsque iln'y avait pas de donné la case avant, 1 si la on passe de case sans donné à case avec donné 
+    remplissage=10; 
     while(i<nl){
 
       if( matrice_marqueurs[i][j_cible]==0){
